@@ -1,0 +1,211 @@
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
+public class CPUScheduer
+{
+    static String[] processNames; //The individual names of each process. 
+    static int[] processPriorities; //The individual priorities of each process. 
+    static int[] processOrders; //The individual orders of when each process enters the CPU. 
+    static int[] processBurstTimes; //The individual burst times of each process. 
+    static int[] processArrivalTimes; //The individual arival times of each process. 
+    static int[] waitTimes, arrivalTimes; //The wait and turnaround times of each process, respectively. 
+    static int numberOfProcesses; //The number of processes initially in the ready queue. 
+    static double averageWaitTime, averageTurnaroundTime; //The average wait time and the average turnaround time, respectively. 
+    
+    public static void main(String[] args)
+    {
+        //INITIALIZATION CODE GOES HERE!
+        
+        int choice; //This variable is an indicator as to what opertion to perform
+        int inputManually; //This variable is a flag which states whether or not the user wants to initialize each of the processes manually or randomly. 
+        
+        do
+        {
+            choice = -1; //Resetting the indicator each time...!
+            while(choice < 0 || choice > 3) //While the choice is out of bounds... 
+            {
+                try
+                {
+                    choice = Integer.parseInt(JOptionPane.showInputDialog("Select an option from the following menu:\nEnter 1 to AAAAA\nEnter 2 to BBBBB\nEnter 3 to exit")); //The user is shown a list of choices and is prompted to select among them to continue by entering the approporiate number. 
+                }
+                catch (NumberFormatException e) //When the user does not input anything... 
+                {
+                    JOptionPane.showMessageDialog(null, "WARNING: No valid input was placed for the operation to perform.\nPlease choose a valid input.", "WARNING: INVALID INPUT DETECTED!", 2); //A message is shown to the user stating that an invalid input was entered.
+                    choice = -1; //The choice is set to -1 so that the loop can execute again. 
+                }
+            }
+            
+            //Then, the number of processes initially in the ready queue is specified by the user. 
+            try
+            {
+                do
+                {
+                    numberOfProcesses = Integer.parseInt(JOptionPane.showInputDialog("Enter the number of processes initially in the ready queue.\nThere can be up to 5 processes in the queue at one time.")); //The user is prompted to input the number of processes initially in the ready queue.
+                }
+                while(numberOfProcesses < 0); //Continue to ask for input until proper input has been entered. 
+            }
+            catch(NumberFormatException e) //When the user does not input anything... 
+            {
+                JOptionPane.showMessageDialog(null, "WARNING: No valid input was placed for the initial number of processes in the ready queue. \nPlease input a value between 1 and 5.", "WARNING: NO INPUT DETECTED!", 2); //A message is shown to the user stating that no input was entered.
+                numberOfProcesses = 0; //The initial number of processes is set to 0 so that the loop can execute again. 
+            }
+            
+            inputManually = JOptionPane.showConfirmDialog(null, "Do you want to initialize each process manually?\n(YES = MANUAL INPUT; NO = RANDOMIZED INPUT)", "How do you want to input each process?", JOptionPane.YES_NO_OPTION); //The user is asked whether it wants to initialize the processes manually or randomly. 
+            algorithmInitialization(inputManually); //Regardless of which algorithm is chosen to be executed by the user or if whether the user decides to input the processes manually, some preliminary initializations are required, which is what this method does. 
+            switch (choice) //There are different cases based off of what he user decide to do. 
+            {
+                case 1:
+                {
+                    //CODE GOES HERE!
+                    break;
+                }
+                case 2:
+                {
+                    //CODE GOES HERE!
+                    break;
+                }
+            }
+        }
+        while(choice != 3); //Continue to prompt the user as long as the user does not choose to exit the program. 
+        
+        
+        
+    }
+    
+    //This method will initialize each of the processes either manually (via user input) or randomly, depending on what the user decides to do. 
+    private static void algorithmInitialization(int inputManually)
+    {
+        if (inputManually == 0) //If the user decides to input each of the processes manually...
+        {
+            String[] orderOptions = new String[numberOfProcesses]; //For manual input, the list of possible orders is initialized to an array of strings whose size is the number of processes. 
+            
+            //This for loop will initialize the array of orders. 
+            for (int i = 0; i < numberOfProcesses; i++)
+            {
+                orderOptions[i] = Integer.toString(i+1);
+            }
+
+            processNames = new String[numberOfProcesses]; //This array holds the names of each process. 
+            processPriorities = new int[numberOfProcesses]; //This array holds the priority numbers of each process. 
+            processOrders = new int[numberOfProcesses]; //This array holds the orders in which each process arrives in the CPU. 
+            processBurstTimes = new int[numberOfProcesses]; //This array holds the burst times of each process. 
+            processArrivalTimes = new int[numberOfProcesses]; //This array holds the arrival times of each process. 
+            
+            //Each of these variables are placeholders for their respective attributes described above. 
+            String name; 
+            int priority; 
+            int order; 
+            int burstTime; 
+            int arrivalTime; 
+            
+            //This for loop will manually initialize each of the processes. 
+            for (int i=0; i < numberOfProcesses; i++)
+            {
+                //First, the user inputs the process name. 
+                do
+                {
+                    name = JOptionPane.showInputDialog(null, "What is the name of process #"+i+" (of 5)", "Input name of process #"+i+" (of 5)", 3); //The user is prompted to input a name for the process, which is held by the placeholder. 
+                }
+                while(name.isEmpty()); //Continue to ask for a value until a proper input has been entered!
+                processNames[i] = name; //The name of the process is assigned to the value of its placeholder. 
+
+                //Second, the user inputs the priority of the process. 
+                do
+                {
+                    priority = Integer.parseInt(JOptionPane.showInputDialog("Enter the priority number for process #"+i+" (of 5).\nNOTE: A larger/smaller priority number indicates a higher prioriy.")); //The user is prompted to input a name for the process, which is held by the placeholder. 
+                }
+                while(numberOfProcesses < 0); //Continue to ask for a value until a proper input has been entered!
+                processPriorities[i] = priority; //The priority of the process is assigned to the value of its placeholder. 
+
+                //Third, the user specifies the order in which the process arrives inside the CPU. 
+                String s;
+                do
+                {
+                    s = JOptionPane.showInputDialog(null, "Please specify the order in which process " + processNames[i] + " arives in the CPU:", "Specifying order of "+processNames[i], JOptionPane.QUESTION_MESSAGE, null, orderOptions, null).toString(); //The user is prompted to select an order for the process among the list of remaining orders (i.e. the options which have not been x-ed out), which is held by the placeholder. 
+                    if (s.equals("X")) //If the user selects an option which has already been used (i.e. the selection has already been x-ed out)... 
+                    {
+                        JOptionPane.showMessageDialog(null, "WARNING: You selected an option that was not valid.\nPlease select an option which has not been crossed out.", "WARNING: INVALID INPUT DETECTED!", JOptionPane.WARNING_MESSAGE); //A message is shown to the user stating that a valid option needed to be selected. 
+                    }
+                }
+                while (s.equals("X")); //Continute to ask for input until the user selects a valid option. 
+                order = Integer.parseInt(s); //The value of the placeholder is set to the integer value of the selected option. 
+                orderOptions[order-1] = "X"; //"Eliminating" the option that was just chosen from the entire list of orders by x-ing it out so that the user cannot select it again. 
+                processOrders[i] = order; //The order of the process is assigned to the value of its placholder. 
+
+                //Fourth, the user inputs the burst time of the process. 
+                do
+                {
+                    try
+                    {
+                        burstTime = Integer.parseInt(JOptionPane.showInputDialog("Enter the CPU burst time of process #"+i+" (of 5).")); //The user is prompted to input a burst time for the process, which is held by the placeholder. 
+                    }
+                    catch(NumberFormatException e) //When the user does not input anything...
+                    {
+                        JOptionPane.showMessageDialog(null, "WARNING: No valid input was placed for the burst time of this proces.", "WARNING: NO INPUT DETECTED!", JOptionPane.WARNING_MESSAGE); //A message is shown to the user stating that no input was entered.
+                        burstTime = 0; //The burst time of the process is set to 0 so that the loop can execute again. 
+                    }
+                }
+                while(burstTime < 0); //Continue to ask for a value until a proper input has been entered!
+                processBurstTimes[i] = burstTime; //The burst time of the process is assigned to the value of its placholder. 
+
+                //Finally, the user inputs the time that the process arrives into the CPU. 
+                do
+                {
+                    try
+                    {
+                        arrivalTime = Integer.parseInt(JOptionPane.showInputDialog("Enter the time that process #"+i+" (of 5) arrives in the CPU.")); //The user is prompted to input a name for the process, which is held by the placeholder. 
+                    }
+                    catch (NumberFormatException e) //When the user does not input anything...
+                    {
+                        JOptionPane.showMessageDialog(null, "WARNING: No valid input was placed for the arrival time of this process.", "WARNING: NO INPUT DETECTED!", JOptionPane.WARNING_MESSAGE); //A message is shown to the user stating that no input was entered.
+                        arrivalTime = 0; //The arrival time of the process is set to 0 so that the loop can execute again. 
+                    }
+                }
+                while(arrivalTime < 0); //Continue to ask for a value until a proper input has been entered!
+                processArrivalTimes[i] = arrivalTime; //The arrival time of the process is assigned to the value of its placeholder. 
+            }
+        }
+        else //Otherwise, if the user decides to randomly generate each of the processes...
+        {
+            ArrayList<Integer> orderOptions = new ArrayList(); //For random input, the list of possible orders is initialized to an arraylist of integers. 
+            
+            //This for loop will initialize the arraylist. 
+            for (int i = 1; i <= numberOfProcesses; i++)
+            {
+                orderOptions.add(i);
+            }
+            
+            int index; //This variable represents the specific position within the arraylist from which to get the order of the process. 
+            for (int i = 1; i <= numberOfProcesses; i++)
+            {
+                processNames[i] = "P" + Integer.toString(i); //First, the process is given a generic name
+
+                processPriorities[i] = (int)((Math.random()*50)+1); //Second, the priority of the process is a random number between XXX AND YYY, which is consistent with our assumptions. 
+                
+                //Third, the orders in which each process eneters the CPU are randomly assigned. 
+                index = (int)(Math.random()*orderOptions.size()); //The position in the arraylist from which the order of the process is assigned is randomly generated. 
+                processOrders[i] = orderOptions.get(index); //The order of the process is retreived from the arraylist at this random index. 
+                orderOptions.remove(index); //The process order at this random index is removed from the entire arraylist of orders. 
+                
+                processBurstTimes[i] = (int)((Math.random()*50)+1); //Fourth, the burst time of the process is a random number between XXX AND YYY, which is consistent with our assumptions. 
+                
+                processArrivalTimes[i] = (int)((Math.random()*50)+1); //Finally the arrival time of the process is a random number between XXX AND YYY, which is consistent with our assumptions. 
+            }
+        }
+        
+        
+        
+    }
+    
+    //CPU SCHEDULING ALGORITHS GO HERE!
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
