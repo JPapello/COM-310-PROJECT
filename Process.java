@@ -129,4 +129,19 @@ public class Process {
     {
         return this.priorityIncluded;
     }
+    
+    public String toString()
+    {
+        String s = "";
+        s += "Thread # " + this.getID() + "\n";
+        s += "Arrival Time: " + getArrivalTime() + "\n";
+        s += "Burst Time: " + getBurstTime() + "\n";
+        s += "Priority: " + getPriority() + "\n";
+        return s;
+    }
+    
+    public void show()
+    {
+        System.out.println(toString());
+    }
 }
