@@ -1,18 +1,21 @@
 import javax.swing.JOptionPane;
 
-public class CPUScheduer
+public class CPUScheduler
 {
-    static Process[] processes; //An array containing the individual processes in the ready queue. Each process has an ID Number, a Burst Time, and an Arrival Time. 
-    //static String[] processNames; //The individual names of each process. This array will be parallel to the array of processes. 
-    //static int[] processPriorities; //The individual priorities of each process. This array will be parallel to the array of processes. 
-    //static int[] processOrders; //The individual orders of when each process enters the CPU. This array will be parallel to the array of processes. 
-    static int[] processBurstTimes; //The individual burst times of each process. This array will be parallel to the array of processes. 
-    static int[] processArrivalTimes; //The individual arival times of each process. This array will be parallel to the array of processes. 
-    //static int[] waitTimes, arrivalTimes; //The wait and turnaround times of each process, respectively. 
-    static int numberOfProcesses; //The number of processes initially in the ready queue. 
-    static double averageWaitTime, averageTurnaroundTime; //The average wait time and the average turnaround time, respectively. 
+    private final int MAX_NUMBER_OF_PROCESSES = 10;
+    private Process[] processes; //An array containing the individual processes in the ready queue. Each process has an ID Number, a Burst Time, and an Arrival Time. 
+    private int[] processBurstTimes; //The individual burst times of each process. This array will be parallel to the array of processes. 
+    private int[] processArrivalTimes; //The individual arival times of each process. This array will be parallel to the array of processes. 
+    private int numberOfProcesses; //The number of processes initially in the ready queue. 
+    private double averageWaitTime, averageTurnaroundTime; //The average wait time and the average turnaround time, respectively. 
     
-    public static void main(String[] args)
+    public CPUScheduler()
+    {
+        this.numberOfProcesses = 0;
+        this.processes = new Process[10];
+    }
+    
+    public void main(String[] args)
     {
         int choice; //This variable is an indicator as to what opertion to perform
         int inputManually; //This variable is a flag which states whether or not the user wants to initialize each of the processes manually or randomly. 
@@ -73,13 +76,10 @@ public class CPUScheduer
             }
         }
         while(choice != 3); //Continue to prompt the user as long as the user does not choose to exit the program. 
-        
-        
-        
     }
     
     //This method will initialize each of the processes either manually (via user input) or randomly, depending on what the user decides to do. 
-    private static void algorithmInitialization(int inputManually)
+    private void algorithmInitialization(int inputManually)
     {
         processes = new Process[numberOfProcesses]; //The length of the array of processes is created as a new array of process objects whose length is the number of processes. 
         processBurstTimes = new int[numberOfProcesses]; //The array of burst times is created as an array of integers with a length equal to the number of processes. 
@@ -142,7 +142,7 @@ public class CPUScheduer
                 while(arrivalTime < 0 || arrivalTime > 100); //Continue to ask for a value until a proper input has been entered!
                 processArrivalTimes[i] = arrivalTime; //The arrival time of the process is assigned to the value of its placeholder. 
                 
-                processes[i] = new Process(i+1, processBurstTimes[i], processArrivalTimes[i]); //With each of these specifications, a new process object is created and placed into the array of processes. 
+                processes[i] = new Process(i+1, processBurstTimes[i], processArrivalTimes[i], 0, false); //With each of these specifications, a new process object is created and placed into the array of processes. 
             }
             
         }
@@ -154,7 +154,7 @@ public class CPUScheduer
                 //First, the ID Number for the process being created is simply the index of the for loop. 
                 processBurstTimes[i] = (int)((Math.random()*10)+1); //Second, the burst time of the process is set to a random number between 1 time unit and 10 time units, which is consistent with our assumptions. 
                 processArrivalTimes[i] = (int)((Math.random()*100)+0); //Lastly, the arrival time of the process is set to a random number between 0 time units and 100 time units, which is consistent with our assumptions. 
-                processes[i] = new Process(i+1, processBurstTimes[i], processArrivalTimes[i]); //With each of these specifications, a new process object is created and placed into the array of processes. 
+                processes[i] = new Process(i+1, processBurstTimes[i], processArrivalTimes[i], 0, false); //With each of these specifications, a new process object is created and placed into the array of processes. 
             }
         }
         
@@ -164,13 +164,40 @@ public class CPUScheduer
     
     //CPU SCHEDULING ALGORITHS GO HERE!
     
+    /*
+    Anything afterwards was added by Jude
+    */
+
+    public void addProcess()
+    {
+        this.processes[numberOfProcesses] = new Process(numberOfProcesses + 1);
+        this.processes[numberOfProcesses].input();
+        this.numberOfProcesses++;
+    }
     
+    public void addProcess(Process p)
+    {
+        this.processes[numberOfProcesses] = p.deepCopy();
+        this.numberOfProcesses++;
+    }
     
+    public Process getProcessWithNumber(int index)
+    {
+        return this.processes[index];
+    }
     
+    public void deleteProcessWithNumber(int index)
+    {
+        for(int i = index; i < numberOfProcesses - 1; i++)
+        {
+            this.processes[i] = this.processes[i - 1];
+        }
+        this.numberOfProcesses--;
+    }
     
-    
-    
-    
-    
+    public int getNumberOfProcesses()
+    {
+        return this.numberOfProcesses;
+    }
     
 }
