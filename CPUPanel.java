@@ -1,10 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 // @Author Jude Andre II
-package cpu.scheduler;
+
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -23,6 +18,8 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 public class CPUPanel extends JPanel implements ActionListener{
+    
+    //Java Components
     JTable inputTable, outputTable;
     JScrollPane inputScrollPane, outputScrollPane;
     JButton beginButton, oneStepButton, randomProcessButton, addProcessButton, removeProcessButton, resetButton;
@@ -30,25 +27,34 @@ public class CPUPanel extends JPanel implements ActionListener{
     JRadioButton firstComeFirstServed, shortestJobFirst, roundRobin;
     ButtonGroup methods = new ButtonGroup();
     JCheckBox priority;
+    
+    //Table Data
     String[] inputColumnNames = {"Thread Number", "Arrival Time", "Burst Time", "Priority"};
     String[] outputColumnNames = {"Thread Number", "Time Arrived", "Time Used"};
-    Object[][] inputData = {{1, 40, 10, 4}, {2, 4, 7, 2}};
-    Object[][] outputData = {{2, 4, 11},{1, 40, 50}};
+    Object[][] inputData = {};
+    Object[][] outputData = {};
+    
+    //CPU Simulator
+    CPUScheduler cpu = new CPUScheduler();
     
     public CPUPanel()
     {
-        firstComeFirstServed = new JRadioButton("First Come, First Served");
-        shortestJobFirst = new JRadioButton("Shortest Job First");
-        roundRobin = new JRadioButton("Round Robin");
-        priority = new JCheckBox("Priority");
-        firstComeFirstServed.setPreferredSize(new Dimension(190, 20));
-        shortestJobFirst.setPreferredSize(new Dimension(190, 20));
-        roundRobin.setPreferredSize(new Dimension(280, 20));
-        priority.setPreferredSize(new Dimension(110, 20));
-        methods.add(firstComeFirstServed);
-        methods.add(shortestJobFirst);
-        methods.add(roundRobin);
         
+        //Initializes radio buttons
+        firstComeFirstServed = new JRadioButton("First Come, First Served");  //First Come First Served 
+        firstComeFirstServed.setPreferredSize(new Dimension(190, 20));
+        methods.add(firstComeFirstServed);
+        shortestJobFirst = new JRadioButton("Shortest Job First"); //Shortest Job First
+        shortestJobFirst.setPreferredSize(new Dimension(160, 20));
+        methods.add(shortestJobFirst);
+        roundRobin = new JRadioButton("Round Robin"); //Round Robin
+        roundRobin.setPreferredSize(new Dimension(155, 20));
+        methods.add(roundRobin);
+        priority = new JCheckBox("Priority"); //Priority
+        priority.setPreferredSize(new Dimension(160, 20));
+        
+        
+        //Initializes Buttons
         beginButton = new JButton("Run");
         beginButton.setPreferredSize(new Dimension(100, 50));
         beginButton.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -128,9 +134,11 @@ public class CPUPanel extends JPanel implements ActionListener{
                 int priorityNum = 0;
                 if(priority.isSelected())
                 {
-                    priorityNum = rand.nextInt(20);
+                    priorityNum = rand.nextInt(21);
                 }
-                Object[] process = {num, arrivalTime, burstTime, priorityNum};
+                cpu.addProcess(new Process(inputData.length + 1, rand.nextInt(50) + 1, rand.nextInt(201), priorityNum, priority.isSelected()));
+                Process p = cpu.getProcessWithNumber(cpu.getNumberOfProcesses() - 1).deepCopy();
+                Object[] process = {p.getID(), p.getArrivalTime(), p.getBurstTime(), p.getPriority()};
                 Object[][] inputDataTemp = new Object[inputData.length + 1][3];
                 for(int i = 0; i < inputData.length; i++)
                 {
@@ -168,23 +176,24 @@ public class CPUPanel extends JPanel implements ActionListener{
         }
         else if(e.getSource() == addProcessButton)
         {
-            int num = inputData.length + 1;
-            int burstTime = Integer.parseInt(JOptionPane.showInputDialog(this, "What is the burst time of this process?.", "Add Process", JOptionPane.QUESTION_MESSAGE));
-            int arrivalTime = Integer.parseInt(JOptionPane.showInputDialog(this, "What is the arrival time of this process?.", "Add Process", JOptionPane.QUESTION_MESSAGE));
-            int priorityNum = 0;
-            if(priority.isSelected())
+            if(inputData.length == 10)
             {
-                priorityNum = Integer.parseInt(JOptionPane.showInputDialog(this, "What is the arrival time of this process?.", "Add Process", JOptionPane.QUESTION_MESSAGE));
+                JOptionPane.showMessageDialog(this, "Sorry, you can only have a maximum of 10 processes.", "Too many Processes", JOptionPane.ERROR_MESSAGE);
             }
-            Object[] process = {num, arrivalTime, burstTime, priorityNum};
-            Object[][] inputDataTemp = new Object[inputData.length + 1][3];
-            for(int i = 0; i < inputData.length; i++)
+            else
             {
-                inputDataTemp[i] = inputData[i];
+                cpu.addProcess();
+                Process p = cpu.getProcessWithNumber(cpu.getNumberOfProcesses() - 1).deepCopy();
+                Object[] process = {p.getID(), p.getArrivalTime(), p.getBurstTime(), p.getPriority()};
+                Object[][] inputDataTemp = new Object[inputData.length + 1][3];
+                for(int i = 0; i < inputData.length; i++)
+                {
+                    inputDataTemp[i] = inputData[i];
+                }
+                inputDataTemp[inputDataTemp.length - 1] = process;
+                inputData = inputDataTemp;
+                updateTable(inputTable);
             }
-            inputDataTemp[inputDataTemp.length - 1] = process;
-            inputData = inputDataTemp;
-            updateTable(inputTable);
         }
         else
         {
