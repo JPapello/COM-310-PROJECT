@@ -157,10 +157,10 @@ public class CPUPanel extends JPanel implements ActionListener{
                 processNum[i] = i + 1;
             }
             int i = (int)(JOptionPane.showInputDialog(this, "Please specify the process number to delete.", "Delete Process", JOptionPane.QUESTION_MESSAGE, null, processNum, processNum[0]));
+            cpu.deleteProcessWithNumber(i);
             Object[][] inputDataTemp = new Object[inputData.length - 1][3];
             for(int j = 0; j < inputDataTemp.length; j++)
             {
-                System.out.println(j);
                 if(j >= i - 1)
                 {
                     inputDataTemp[j] = inputData[j + 1];
