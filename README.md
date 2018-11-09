@@ -9,4 +9,4 @@ Assumptions for the project:
   5) The priority of any given process can range from 1 to 100 where a higher number implies a higher priority.  
     a) If a process is created, by the user or randomly, with priority, initial priority ranges from 0 to 20.
   6) If there are two processes with the same priority, the one which gets executed first is the one with the shortest burst time (see Assumption #7). 
-  7) If two processes has the same burst time, then the processes are chosen at random and thereafter executed. 
+  7) If two processes has the same burst time, then the process with the lowest ID number gets executed first. 
