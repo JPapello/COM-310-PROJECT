@@ -1,6 +1,9 @@
+package cpu;
+
 // @Author Jude Andre II
 
 
+import cpu.CPUScheduler;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -22,15 +25,14 @@ public class CPUPanel extends JPanel implements ActionListener{
     //Java Components
     JTable inputTable, outputTable;
     JScrollPane inputScrollPane, outputScrollPane;
-    JButton beginButton, oneStepButton, randomProcessButton, addProcessButton, removeProcessButton, resetButton;
+    JButton runButton, randomProcessButton, addProcessButton, removeProcessButton, resetButton;
     JLabel inputTableLabel, outputTableLabel, averageWaitTime, averageTurnaroundTime;
-    JRadioButton firstComeFirstServed, shortestJobFirst, roundRobin;
+    JRadioButton firstComeFirstServed, shortestJobFirst;
     ButtonGroup methods = new ButtonGroup();
-    JCheckBox priority;
     
     //Table Data
-    String[] inputColumnNames = {"Thread Number", "Arrival Time", "Burst Time", "Priority"};
-    String[] outputColumnNames = {"Thread Number", "Time Arrived", "Time Used"};
+    String[] inputColumnNames = {"Thread Number", "Arrival Time", "Burst Time"};
+    String[] outputColumnNames = {"Thread Number", "Wait Time", "Turnaround Time"};
     Object[][] inputData = {};
     Object[][] outputData = {};
     
@@ -42,31 +44,22 @@ public class CPUPanel extends JPanel implements ActionListener{
         
         //Initializes radio buttons
         firstComeFirstServed = new JRadioButton("First Come, First Served");  //First Come First Served 
-        firstComeFirstServed.setPreferredSize(new Dimension(190, 20));
+        firstComeFirstServed.setPreferredSize(new Dimension(300, 20));
         methods.add(firstComeFirstServed);
         shortestJobFirst = new JRadioButton("Shortest Job First"); //Shortest Job First
-        shortestJobFirst.setPreferredSize(new Dimension(160, 20));
+        shortestJobFirst.setPreferredSize(new Dimension(300, 20));
         methods.add(shortestJobFirst);
-        roundRobin = new JRadioButton("Round Robin"); //Round Robin
-        roundRobin.setPreferredSize(new Dimension(155, 20));
-        methods.add(roundRobin);
-        priority = new JCheckBox("Priority"); //Priority
-        priority.setPreferredSize(new Dimension(160, 20));
-        
+        firstComeFirstServed.setSelected(true);
         
         //Initializes Buttons
-        beginButton = new JButton("Run");
-        beginButton.setPreferredSize(new Dimension(100, 50));
-        beginButton.setFont(new Font("Arial", Font.PLAIN, 12));
-        beginButton.addActionListener(this);
+        runButton = new JButton("Run");
+        runButton.setPreferredSize(new Dimension(100, 50));
+        runButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        runButton.addActionListener(this);
         randomProcessButton = new JButton("<html><center>Add Random<br>Process</center></html>");
         randomProcessButton.setPreferredSize(new Dimension(100, 50));
         randomProcessButton.setFont(new Font("Arial", Font.PLAIN, 12));
         randomProcessButton.addActionListener(this);
-        oneStepButton = new JButton("Next Step");
-        oneStepButton.setPreferredSize(new Dimension(100, 50));
-        oneStepButton.setFont(new Font("Arial", Font.PLAIN, 12));
-        oneStepButton.addActionListener(this);
         addProcessButton = new JButton("<html><center>Add New<br>Process</center></html>");
         addProcessButton.setPreferredSize(new Dimension(100, 50));
         addProcessButton.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -94,16 +87,13 @@ public class CPUPanel extends JPanel implements ActionListener{
         averageWaitTime.setPreferredSize(new Dimension(800, 20));
         averageTurnaroundTime.setPreferredSize(new Dimension(800, 20));
         
-        add(beginButton);
+        add(runButton);
         add(randomProcessButton);
-        add(oneStepButton);
         add(addProcessButton);
         add(removeProcessButton);
         add(resetButton);
         add(firstComeFirstServed);
         add(shortestJobFirst);
-        add(roundRobin);
-        add(priority);
         add(inputTableLabel);
         add(inputScrollPane);
         add(outputTableLabel);
@@ -116,6 +106,7 @@ public class CPUPanel extends JPanel implements ActionListener{
     {
         if(e.getSource() == resetButton)
         {
+            cpu.reset();
             inputData = new Object[0][3];
             updateTable(inputTable);
         }
@@ -128,17 +119,9 @@ public class CPUPanel extends JPanel implements ActionListener{
             else
             {
                 Random rand = new Random();
-                int num = inputData.length + 1;
-                int burstTime = rand.nextInt(50) + 1;
-                int arrivalTime = rand.nextInt(201);
-                int priorityNum = 0;
-                if(priority.isSelected())
-                {
-                    priorityNum = rand.nextInt(21);
-                }
-                cpu.addProcess(new Process(inputData.length + 1, rand.nextInt(50) + 1, rand.nextInt(201), priorityNum, priority.isSelected()));
+                cpu.addProcess(new Process(inputData.length + 1, rand.nextInt(50) + 1, rand.nextInt(201)));
                 Process p = cpu.getProcessWithNumber(cpu.getNumberOfProcesses() - 1).deepCopy();
-                Object[] process = {p.getID(), p.getArrivalTime(), p.getBurstTime(), p.getPriority()};
+                Object[] process = {p.getID(), p.getArrivalTime(), p.getBurstTime()};
                 Object[][] inputDataTemp = new Object[inputData.length + 1][3];
                 for(int i = 0; i < inputData.length; i++)
                 {
@@ -184,7 +167,7 @@ public class CPUPanel extends JPanel implements ActionListener{
             {
                 cpu.addProcess();
                 Process p = cpu.getProcessWithNumber(cpu.getNumberOfProcesses() - 1).deepCopy();
-                Object[] process = {p.getID(), p.getArrivalTime(), p.getBurstTime(), p.getPriority()};
+                Object[] process = {p.getID(), p.getArrivalTime(), p.getBurstTime()};
                 Object[][] inputDataTemp = new Object[inputData.length + 1][3];
                 for(int i = 0; i < inputData.length; i++)
                 {
@@ -194,6 +177,30 @@ public class CPUPanel extends JPanel implements ActionListener{
                 inputData = inputDataTemp;
                 updateTable(inputTable);
             }
+        }
+        else if(e.getSource() == runButton)
+        {
+            if(firstComeFirstServed.isSelected())
+            {
+                cpu.FCFS();
+            }
+            else if(shortestJobFirst.isSelected())
+            {
+                cpu.SJF();
+            }
+            
+            int[] order = cpu.getOutputOrder();
+            Object[][] outputDataTemp = new Object[order.length][3];
+            for(int i = 0; i < order.length; i++)
+            {
+                outputDataTemp[i][0] = cpu.getProcessWithNumber(order[i]).getID();
+                outputDataTemp[i][1] = cpu.getWaitTimeForProcess(order[i]);
+                outputDataTemp[i][2] = cpu.getTurnaroundTimeForProcess(order[i]);
+            }
+            outputData = outputDataTemp;
+            updateTable(outputTable);
+            averageWaitTime.setText("Average Wait Time: " + cpu.getAverageWaitTime());
+            averageTurnaroundTime.setText("Average Turnaround Time: " + cpu.getAverageTurnaroundTime());
         }
         else
         {
@@ -223,7 +230,7 @@ public class CPUPanel extends JPanel implements ActionListener{
             data = outputData;
             names = outputColumnNames;
         }
-        inputTable.setModel(new AbstractTableModel() {
+        table.setModel(new AbstractTableModel() {
             public int getRowCount() {
                 return data.length;
             }

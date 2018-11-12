@@ -1,3 +1,5 @@
+package cpu;
+
 
 
 import javax.swing.JOptionPane;
@@ -6,20 +8,16 @@ import javax.swing.JOptionPane;
  * @author Jude Andre II
  */
 
-public class Process {
+public class Process{
     private int idNum;
     private int burstTime;
     private int arrivalTime;
-    private int priority;
-    private boolean priorityIncluded;
     
     public Process()
     {
         this.idNum = 0;
         this.burstTime = 0;
         this.arrivalTime = 0;
-        this.priority = 0;
-        this.priorityIncluded = false;
     }
     
     public Process(int idNum)
@@ -27,17 +25,13 @@ public class Process {
         this.idNum = idNum;
         this.burstTime = 0;
         this.arrivalTime = 0;
-        this.priority = 0;
-        this.priorityIncluded = false;
     }
     
-    public Process(int idNum, int burstTime, int arrivalTime, int priority, boolean priorityIncluded)
+    public Process(int idNum, int burstTime, int arrivalTime)
     {
         this.idNum = idNum;
         this.burstTime = burstTime;
         this.arrivalTime = arrivalTime;
-        this.priority = priority;
-        this.priorityIncluded = priorityIncluded;
     }
     
     public void input()
@@ -52,32 +46,11 @@ public class Process {
         {
             setArrivalTime(newArrivalTime);
         }
-        Object[] trueOrFalse = {"Yes", "No"};
-        String newPriorityIncluded = (String)(JOptionPane.showInputDialog(null, "Will priority be included in this process?", "Add Priority", JOptionPane.QUESTION_MESSAGE, null, trueOrFalse, trueOrFalse[0]));
-        if(newPriorityIncluded.equals("Yes"))
-        {
-            setPriorityInclude(true);
-        }
-        else
-        {
-            setPriorityInclude(false);
-        }
-        
-        if(priorityIncluded)
-        {
-            int newPriority = Integer.parseInt(JOptionPane.showInputDialog("Please insert the priority of the process. \n(If there already exists an ID number and you don't want to change it, input '-1')"));
-            if(newPriority != -1)
-            {
-                setPriority(newPriority);
-            }
-        }
-        
-        System.out.println(getID() + " " + getBurstTime() + " " + getArrivalTime());
     }
     
     public Process deepCopy()
     {
-        return new Process(idNum, burstTime, arrivalTime, priority, priorityIncluded);
+        return new Process(idNum, burstTime, arrivalTime);
     }
     
     public void setID(int idNum)
@@ -95,16 +68,6 @@ public class Process {
         this.arrivalTime = arrivalTime;
     }
     
-    public void setPriority(int priority)
-    {
-        this.priority = priority;
-    }
-    
-    public void setPriorityInclude(boolean priorityIncluded)
-    {
-        this.priorityIncluded = priorityIncluded;
-    }
-    
     public int getID()
     {
         return this.idNum;
@@ -120,23 +83,12 @@ public class Process {
         return this.arrivalTime;
     }
     
-    public int getPriority()
-    {
-        return this.priority;
-    }
-    
-    public boolean getPriorityIncluded()
-    {
-        return this.priorityIncluded;
-    }
-    
     public String toString()
     {
         String s = "";
         s += "Thread # " + this.getID() + "\n";
         s += "Arrival Time: " + getArrivalTime() + "\n";
         s += "Burst Time: " + getBurstTime() + "\n";
-        s += "Priority: " + getPriority() + "\n";
         return s;
     }
     
