@@ -165,17 +165,24 @@ public class CPUPanel extends JPanel implements ActionListener{
             }
             else
             {
-                cpu.addProcess();
-                Process p = cpu.getProcessWithNumber(cpu.getNumberOfProcesses() - 1).deepCopy();
-                Object[] process = {p.getID(), p.getArrivalTime(), p.getBurstTime()};
-                Object[][] inputDataTemp = new Object[inputData.length + 1][3];
-                for(int i = 0; i < inputData.length; i++)
+                try
                 {
-                    inputDataTemp[i] = inputData[i];
+                    cpu.addProcess();
+                    Process p = cpu.getProcessWithNumber(cpu.getNumberOfProcesses() - 1).deepCopy();
+                    Object[] process = {p.getID(), p.getArrivalTime(), p.getBurstTime()};
+                    Object[][] inputDataTemp = new Object[inputData.length + 1][3];
+                    for(int i = 0; i < inputData.length; i++)
+                    {
+                        inputDataTemp[i] = inputData[i];
+                    }
+                    inputDataTemp[inputDataTemp.length - 1] = process;
+                    inputData = inputDataTemp;
+                    updateTable(inputTable);
                 }
-                inputDataTemp[inputDataTemp.length - 1] = process;
-                inputData = inputDataTemp;
-                updateTable(inputTable);
+                catch(ArrayIndexOutOfBoundsException ex)
+                {
+                    JOptionPane.showMessageDialog(this, "One or more empty inputs was detected. Nothing is being added.", "Empty Input", JOptionPane.WARNING_MESSAGE);
+                }
             }
         }
         else if(e.getSource() == runButton)

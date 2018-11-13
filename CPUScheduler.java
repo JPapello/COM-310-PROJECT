@@ -2,6 +2,7 @@ package cpu;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.JOptionPane;
 
 public class CPUScheduler
 {
@@ -162,10 +163,18 @@ public class CPUScheduler
 
     public void addProcess()
     {
-        this.processes[numberOfProcesses] = new Process(numberOfProcesses + 1);
-        this.processes[numberOfProcesses].input();
-        this.numberOfProcesses++;
-        updateArrays();
+        Process p = new Process(numberOfProcesses + 1);
+        p.input();
+        if(p.getBurstTime() > 0)
+        {
+            this.processes[numberOfProcesses] = p;
+            this.numberOfProcesses++;
+            updateArrays();
+        }
+        else
+        {
+            return;
+        }
     }
     
     public void addProcess(Process p)

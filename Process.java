@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
  * @author Jude Andre II
  */
 
-public class Process{
+public class Process implements Comparable{
     private int idNum;
     private int burstTime;
     private int arrivalTime;
@@ -36,16 +36,24 @@ public class Process{
     
     public void input()
     {
-        int newBurstTime = Integer.parseInt(JOptionPane.showInputDialog("Please insert the burst time of the process. \n(If there already exists a burst time and you don't want to change it, input '-1')"));
-        if(newBurstTime != -1)
+        try
         {
-            setBurstTime(newBurstTime);
+            int newArrivalTime = Integer.parseInt(JOptionPane.showInputDialog("Please insert the arrival time of the process. \n(If there already exists an arrival time and you don't want to change it, input '-1')"));
+            if(newArrivalTime != -1)
+            {
+                setArrivalTime(newArrivalTime);
+            }
+            int newBurstTime = Integer.parseInt(JOptionPane.showInputDialog("Please insert the burst time of the process. \n(If there already exists a burst time and you don't want to change it, input '-1')"));
+            if(newBurstTime != -1)
+            {
+                setBurstTime(newBurstTime);
+            }
         }
-        int newArrivalTime = Integer.parseInt(JOptionPane.showInputDialog("Please insert the arrival time of the process. \n(If there already exists an arrival time and you don't want to change it, input '-1')"));
-        if(newArrivalTime != -1)
+        catch(NumberFormatException e)
         {
-            setArrivalTime(newArrivalTime);
+            System.out.println("Error, empty input.");
         }
+        
     }
     
     public Process deepCopy()
@@ -95,5 +103,10 @@ public class Process{
     public void show()
     {
         System.out.println(toString());
+    }
+
+    @Override
+    public int compareTo(Object t) {
+        return Integer.compare(this.arrivalTime, ((Process)(t)).getArrivalTime());
     }
 }
